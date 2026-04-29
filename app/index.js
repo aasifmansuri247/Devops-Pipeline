@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-    res.send("this app running by GitHub Pipeline + Docker Successfully!");
+    res.send("this app running by GitHub Pipeline + Docker Successfully! Version 2");
 });
 
 app.get("/health", (req, res) => {

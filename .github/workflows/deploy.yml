@@ -23,8 +23,8 @@ jobs:
       - name: deploy ec2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-          docker stop devops-app || true
-          docker rm devops-app || true
-          docker pull ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
-          docker run -d -p 80:3000 --name devops-app ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
+          sudo docker stop devops-app || true
+          sudo docker rm devops-app || true
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
+          sudo docker run -d -p 80:3000 --name devops-app ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
           EOF

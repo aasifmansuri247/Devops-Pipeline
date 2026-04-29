@@ -1,25 +1,30 @@
-name: Pull and Deploy Artifacts
+name: deploy to AWS EC2
 
-on:
+on: 
   workflow_run:
-    workflows: ["Build and Push Docker Image"]   # must match exact name
-    types:
+    workflows: ["Build and Push Docker Image"]
+    types: 
       - completed
 
-jobs:
+jobs: 
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
+    if: ${{ github.event.workflow_run.conclusion == 'success'}}
+    
     steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            docker stop devops-app || true
-            docker rm devops-app || true
-            docker pull ${{ secrets.DOCKER_USERNAME }}/devops-app:v1
-            docker run -d -p 80:3000 --name devops-app ${{ secrets.DOCKER_USERNAME }}/devops-app:v1
+      - name: checkout repository
+        uses: actions/checkout@v3
+
+      - name: set up ssh key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: deploy ec2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          docker stop devops-app || true
+          docker rm devops-app || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
+          docker run -d -p 80:3000 --name devops-app ${{ secrets.DOCKER_USERNAME }}/devops-app:v2
+          EOF

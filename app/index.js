@@ -9,7 +9,7 @@ app.get("/health", (req, res) => {
     res.json({ status: "OK" });
 });
 
-const PORT = 3000;
+const PORT = 4000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
